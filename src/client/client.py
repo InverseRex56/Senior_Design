@@ -6,6 +6,7 @@ import datetime
 import base64
 import subprocess
 from flask import Flask, request, jsonify
+import os
 
 ip_address = None
 app = Flask(__name__)
@@ -27,24 +28,9 @@ def get_ip_address():
 
 
 def capture_image():
-    # Initialize USB webcam
-    cap = cv2.VideoCapture(0)
-    
-    # Check if the webcam is opened correctly
-    if not cap.isOpened():
-        raise Exception("Could not open webcam")
-    
-    # Capture frame-by-frame
-    ret, frame = cap.read()
-    
-    # Release the webcam
-    cap.release()
-    
-    # Check if the frame is captured successfully
-    if not ret:
-        raise Exception("Could not capture frame")
-    
-    return frame
+    image = cv2.imread('uploadPictures/test.jpg')
+    return image
+
 
 # Function to convert image to Base64 byte array
 def image_to_byte_array(image):

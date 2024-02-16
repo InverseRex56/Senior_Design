@@ -10,10 +10,12 @@ services:
       context: .
     ports:
       - "8081:8081"
-    devices:
-      - /dev/video0
+    # devices:
+    #   - /dev/video0
     networks:
       - sdc-network
+    volumes:
+      - ./uploadPictures:/app/uploadPictures
 
 networks:
   sdc-network:

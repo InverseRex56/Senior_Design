@@ -6,6 +6,7 @@ from datetime import datetime
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy 
+from sqlalchemy import desc
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@db:5432/db'
@@ -153,11 +154,31 @@ def save_img_db():
     
         # Return a success message
         return 'Image uploaded successfully'
-   
-    
-    
-    
 
+@app.route('/get_img_for_cam/<string:ip>', methods=['POST'])
+def get_img_for_cam(ip):
+    data_db = Image.query.filter_by(ip=ip).order_by(Image.time.desc()).first()
+    data_list = []
+
+    # test code to prove that the data is latest image from db displayed in terminal
+    # in order to use this code, you must first run the /save_img_db endpoint
+    # then open the uploadPictures folder and check the latest image and your ip
+    # finally, use curl -X POST http://localhost:8080/get_img_for_cam/__your_ip__ to see the latest image
+
+    # if data_db:
+    #     data_list = [{
+    #         'pic': data_db.pic,
+    #         'time': data_db.time
+    #     }]
+    # return jsonify({'data': data_list})
+
+    # this is the code that should be used for production. 
+    # no extra brackets are printed, so johnny will get the json formatted btye string
+
+    # if data_db:
+    #     data_list = data_db.pic
+    # return jsonify(data_list)
+    
 #get image from volume then saving raw image to database
 # primary key is ip
 # time
