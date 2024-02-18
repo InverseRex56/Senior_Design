@@ -139,6 +139,7 @@ def save_img_db():
         # Decode the base64-encoded image data
         img_data = base64.b64decode(pic)
 
+
         # Save the image data to a file in the uploadPictures folder
         with open(f"uploadPictures/{time_only}_{ip}.jpg", "wb") as img_file:
             img_file.write(img_data)
@@ -153,17 +154,30 @@ def save_img_db():
         db.session.commit()
     
         # Return a success message
-        return 'Image uploaded successfully'
-
-@app.route('/get_img_for_cam/<string:ip>', methods=['POST'])
+        return 'Image uploaded successfully\n'
+   
+    
+    
+@app.route('/get_img_for_cam/<string:ip>', methods=['GET'])
 def get_img_for_cam(ip):
     data_db = Image.query.filter_by(ip=ip).order_by(Image.time.desc()).first()
     data_list = []
 
-    if data_db:
-        data_list = data_db.pic
-    return jsonify(data_list)
+    # if data_db:
+    #     data_list = data_db.pic
+    # return jsonify(data_list)
+
+    # if data_db:
+    data_list = [{
+        'pic': data_db,
+        'time': data_db
+    }]
     
+    
+    print(data_list,flush=True)
+    return jsonify({'data': data_list})
+    
+
 #get image from volume then saving raw image to database
 # primary key is ip
 # time
