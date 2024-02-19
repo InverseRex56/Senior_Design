@@ -169,8 +169,8 @@ def get_img_for_cam(ip):
 
     # if data_db:
     data_list = [{
-        'pic': data_db,
-        'time': data_db
+        'pic': data_db.pic,
+        'time': data_db.time
     }]
     
     
