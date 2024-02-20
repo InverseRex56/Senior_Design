@@ -1,4 +1,6 @@
+import time
 import socket
+import threading
 import json
 import requests
 import cv2
@@ -6,7 +8,6 @@ import datetime
 import base64
 import subprocess
 from flask import Flask, request, jsonify
-import os
 
 ip_address = None
 app = Flask(__name__)
@@ -28,9 +29,24 @@ def get_ip_address():
 
 
 def capture_image():
-    image = cv2.imread('uploadPictures/test.jpg')
-    return image
-
+    # Initialize USB webcam
+    cap = cv2.VideoCapture(0)
+    
+    # Check if the webcam is opened correctly
+    if not cap.isOpened():
+        raise Exception("Could not open webcam")
+    
+    # Capture frame-by-frame
+    ret, frame = cap.read()
+    
+    # Release the webcam
+    cap.release()
+    
+    # Check if the frame is captured successfully
+    if not ret:
+        raise Exception("Could not capture frame")
+    
+    return frame
 
 # Function to convert image to Base64 byte array
 def image_to_byte_array(image):
@@ -62,6 +78,21 @@ def get_picture():
     except Exception as e:
         return {'error': str(e)}, 500
 
+
+@app.route('/init', methods=['GET', 'POST'])
+def init():
+    # ip_address = get_ip_address()
+    remote_server_url = "http://network:8080/client_init"
+    
+    try:
+        # Sending IP address to remote server
+        response = requests.post(remote_server_url, json={'ip': ip_address})
+        if response.ok:
+            return 'IP address sent successfully to remote server.'
+        else:
+            return 'Failed to send IP address to remote server.', 500
+    except Exception as e:
+        return f'Error: {str(e)}', 500
 
 network_url = 'http://network:8080' 
 
@@ -112,5 +143,9 @@ def test():
 
 if __name__ == "__main__":
     ip_address = get_ip_address()
-    # print(f"IP address: {ip_address}")
-    app.run(host='0.0.0.0', port=8081)  # Change the port as needed
+
+    flask_thread = threading.Thread(target=app.run, kwargs={'host':'0.0.0.0', 'port':8081})
+    flask_thread.start()
+
+    init()
+
